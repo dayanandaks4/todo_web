@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List with Alarm</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List with Alarm</h1>
+
+        <form action="/add" method="POST">
+            <input type="text" name="task" placeholder="Enter task" required>
+            <input type="datetime-local" name="deadline" required>
+            <button type="submit">Add Task</button>
+        </form>
+
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <strong>{{ loop.index }}.</strong> {{ task.name }} 
+                    - <span class="deadline" data-deadline="{{ task.deadline }}"></span>
+                    <a href="/delete/{{ loop.index0 }}" class="delete-btn">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Hidden audio element -->
+    <audio id="alarmSound" src="/static/alarm.mp3" preload="auto"></audio>
+
+    <script>
+        // Check deadlines every second
+        setInterval(function() {
+            const deadlines = document.querySelectorAll('.deadline');
+            const alarm = document.getElementById('alarmSound');
+
+            deadlines.forEach(function(deadlineSpan) {
+                const deadline = new Date(deadlineSpan.dataset.deadline);
+                const now = new Date();
+                const diff = deadline - now;
+
+                if (diff <= 0 && !deadlineSpan.classList.contains('completed')) {
+                    alert("Task '" + deadlineSpan.previousSibling.textContent.trim() + "' deadline reached!");
+                    alarm.play(); // Play sound
+                    deadlineSpan.textContent = "Completed!";
+                    deadlineSpan.classList.add('completed');
+                } else if (diff > 0) {
+                    const minutes = Math.floor(diff / 60000);
+                    deadlineSpan.textContent = minutes + " min left";
+                }
+            });
+
+        }, 1000);
+    </script>
+</body>
+</html>
