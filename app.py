@@ -3,7 +3,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# A list to store tasks
+#A list to store tasks
 tasks = []
 
 @app.route('/')
